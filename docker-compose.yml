@@ -28,8 +28,8 @@ services:
       dockerfile: Dockerfile
     container_name: mysql_slave-1
     restart: unless-stopped
-    depends_on:
-      - mysql_master
+    # depends_on:
+    #   - mysql_master
     volumes:
       # - ./slave/start-replication.sh:/docker-entrypoint-initdb.d/start-replication.sh
       - mysqldata_slave:/var/lib/mysqldata_slave-1
@@ -52,8 +52,8 @@ services:
       dockerfile: Dockerfile
     container_name: mysql_slave-2
     restart: unless-stopped
-    depends_on:
-      - mysql_master
+    # depends_on:
+    #   - mysql_master
     volumes:
       # - ./slave/start-replication.sh:/docker-entrypoint-initdb.d/start-replication.sh
       - mysqldata_slave:/var/lib/mysqldata_slave-2
