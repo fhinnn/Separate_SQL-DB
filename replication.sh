@@ -6,11 +6,6 @@ fi
 
 docker-compose up --build -d
 
-MASTER_HOST=10.0.1.10
-SLAVE_HOST_1=10.0.1.11
-SLAVE_HOST_2=10.0.1.12
-PROXY_HOST=10.0.1.13
-
 while ! mysqladmin ping -h $MASTER_HOST --silent; do
 	sleep 1
 done
@@ -33,8 +28,11 @@ done
 # Process on Slave
 start_slave_stmt="CHANGE MASTER TO MASTER_HOST='$MASTER_HOST',MASTER_USER='$MYSQL_USER',MASTER_PASSWORD='$MYSQL_PASSWORD',MASTER_LOG_FILE='$CURRENT_LOG',MASTER_LOG_POS=$CURRENT_POS; START SLAVE;" && docker exec mysql_slave-1 sh -c "mysql -u root --execute=\"$start_slave_stmt\"" && docker exec mysql_slave-2 sh -c "mysql -u root --execute=\"$start_slave_stmt\"" && echo "Slave Successfully Configured"
 
+# SYNC Master and Slave DB
+db_synch="CREATE DATABASE $MYSQL_DATABASE;" && docker exec mysql_master sh -c "mysql -u root -e \"$db_synch\"" && echo "Database Synchronized"
+
 # #Check Slave Status
-docker exec mysql_slave-1 sh -c "mysql -u root -e 'SHOW SLAVE STATUS\G'" && docker exec mysql_slave-2 sh -c "mysql -u root -e 'SHOW SLAVE STATUS\G'"
+# docker exec mysql_slave-1 sh -c "mysql -u root -e 'SHOW SLAVE STATUS\G'" && docker exec mysql_slave-2 sh -c "mysql -u root -e 'SHOW SLAVE STATUS\G'"
 
 
 
