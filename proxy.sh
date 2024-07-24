@@ -34,7 +34,7 @@ docker exec proxysql-server sh -c "mysql -u $PROXY_ADMIN_USER -p$PROXY_ADMIN_PAS
 
 # Proxy Apply
 proxy_stmt_5="CREATE USER '$PROXY_USER'@'%' IDENTIFIED BY '$PROXY_PASSWORD'; 
-GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$PROXY_USER'@'%' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$PROXY_USER'@'%';
 FLUSH PRIVILEGES;"
 
 docker exec mysql_master sh -c "mysql -u root -e \"$proxy_stmt_5\"" && echo "Proxy Connected"
