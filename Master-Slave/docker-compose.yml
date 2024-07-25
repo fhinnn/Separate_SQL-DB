@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  db-master:
+    build:
+      context: ./master
+      dockerfile: Dockerfile
+    container_name: mysql_master
+    restart: unless-stopped
+    volumes:
+      - mysqldata_master:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
+      # MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: 'Asia/Jakarta'
+    networks:
+      database_net:
+        ipv4_address: ${MASTER_HOST}
+    # healthcheck:
+    #   test: 'mysqladmin ping -h 10.0.1.10'
+    #   interval: 2s
+    #   retries: 20
+  db-slave-1:
+    build:
+      context: ./slave/slave-1
+      dockerfile: Dockerfile
+    container_name: mysql_slave-1
+    restart: unless-stopped
+    # depends_on:
+    #   - mysql_master
+    volumes:
+      # - ./slave/start-replication.sh:/docker-entrypoint-initdb.d/start-replication.sh
+      - mysqldata_slave-1:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
+      # MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: 'Asia/Jakarta'
+    networks:
+      database_net:
+        ipv4_address: ${SLAVE_HOST_1}
+    # healthcheck:
+    #   test: 'mysqladmin ping -h 10.0.1.11'
+    #   interval: 2s
+    #   retries: 20
+  db-slave-2:
+    build:
+      context: ./slave/slave-2
+      dockerfile: Dockerfile
+    container_name: mysql_slave-2
+    restart: unless-stopped
+    # depends_on:
+    #   - mysql_master
+    volumes:
+      # - ./slave/start-replication.sh:/docker-entrypoint-initdb.d/start-replication.sh
+      - mysqldata_slave-2:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
+      # MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: 'Asia/Jakarta'
+    networks:
+      database_net:
+        ipv4_address: ${SLAVE_HOST_2}
+    # healthcheck:
+    #   test: 'mysqladmin ping -h 10.0.1.11'
+    #   interval: 2s
+    #   retries: 20
+  proxysql:
+    image: proxysql/proxysql:latest
+    container_name: proxysql-server
+    environment:
+      # PROXYSQL_ADMIN_USER: ${MYSQL_USER}
+      # PROXYSQL_ADMIN_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: 'Asia/Jakarta'
+    ports:
+      - '${PROXY_PORT}:${PROXY_PORT}'
+      - '${PROXY_ADMIN_PORT}:${PROXY_ADMIN_PORT}'
+    networks:
+      database_net:
+        ipv4_address: ${PROXY_HOST}
+
+networks:
+  database_net:
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
+    external: false
+
+volumes:
+  mysqldata_master:
+  mysqldata_slave-1:
+  mysqldata_slave-2:
