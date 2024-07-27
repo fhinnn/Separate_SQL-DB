@@ -1,14 +1,14 @@
 version: '3.8'
 
 services:
-  db-master:
+  db-master-1:
     build:
-      context: ./master
+      context: ./master/master-1
       dockerfile: Dockerfile
-    container_name: mysql_master
+    container_name: mysql_master-1
     restart: unless-stopped
     volumes:
-      - mysqldata_master:/var/lib/mysql
+      - mysqldata_master-1:/var/lib/mysql
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
       # MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -17,7 +17,28 @@ services:
       TZ: 'Asia/Jakarta'
     networks:
       database_net:
-        ipv4_address: ${MASTER_HOST}
+        ipv4_address: ${MASTER_HOST_1}
+    # healthcheck:
+    #   test: 'mysqladmin ping -h 10.0.1.10'
+    #   interval: 2s
+    #   retries: 20
+  db-master-2:
+    build:
+      context: ./master/master-2
+      dockerfile: Dockerfile
+    container_name: mysql_master-2
+    restart: unless-stopped
+    volumes:
+      - mysqldata_master-2:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
+      # MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: 'Asia/Jakarta'
+    networks:
+      database_net:
+        ipv4_address: ${MASTER_HOST_2}
     # healthcheck:
     #   test: 'mysqladmin ping -h 10.0.1.10'
     #   interval: 2s
@@ -92,6 +113,7 @@ networks:
     external: false
 
 volumes:
-  mysqldata_master:
+  mysqldata_master-1:
+  mysqldata_master-2:
   mysqldata_slave-1:
   mysqldata_slave-2:

@@ -9,7 +9,8 @@ while ! mysqladmin ping -h $PROXY_HOST -P$PROXY_ADMIN_PORT --silent; do
 done
 
 # Process on Proxy
-proxy_stmt_1="INSERT INTO mysql_servers (hostgroup_id, hostname, port, weight) VALUES (1, '$MASTER_HOST', 3306, 1);
+proxy_stmt_1="INSERT INTO mysql_servers (hostgroup_id, hostname, port, weight) VALUES (1, '$MASTER_HOST_1', 3306, 1);
+INSERT INTO mysql_servers (hostgroup_id, hostname, port, weight) VALUES (1, '$MASTER_HOST_2', 3306, 1);
 INSERT INTO mysql_servers (hostgroup_id, hostname, port, weight) VALUES (2, '$SLAVE_HOST_1', 3306, 1);
 INSERT INTO mysql_servers (hostgroup_id, hostname, port, weight) VALUES (2, '$SLAVE_HOST_2', 3306, 1);"
 
@@ -37,4 +38,4 @@ proxy_stmt_5="CREATE USER '$PROXY_USER'@'%' IDENTIFIED BY '$PROXY_PASSWORD';
 GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$PROXY_USER'@'%';
 FLUSH PRIVILEGES;"
 
-docker exec mysql_master sh -c "mysql -u root -e \"$proxy_stmt_5\"" && echo "Proxy Connected"
+docker exec mysql_master-1 sh -c "mysql -u root -e \"$proxy_stmt_5\"" && echo "Proxy Connected"
