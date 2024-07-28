@@ -101,6 +101,7 @@ services:
     ports:
       - '${PROXY_PORT}:${PROXY_PORT}'
       - '${PROXY_ADMIN_PORT}:${PROXY_ADMIN_PORT}'
+      - 6080:6080
     networks:
       database_net:
         ipv4_address: ${PROXY_HOST}
